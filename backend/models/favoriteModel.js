@@ -28,6 +28,19 @@ const Favorite = {
 
         return result.insertId;
 
+    },
+
+    delete: async (id) => {
+
+        const query = `
+                DELETE
+                FROM preferiti
+                WHERE id = ?
+        `
+
+        const [result] = await connection.execute(query, [id]);
+
+        return result.affectedRows > 0;
     }
 }
 

@@ -25,12 +25,12 @@ const index = async (req, res) => {
 const store = async (req, res) => {
     try {
 
-        const newId = await Favorite.create(req.body);
+        const id = await Favorite.create(req.body);
 
         res.status(201).json({
             success: true,
             message: 'Preferito aggiunto con successo',
-            data: { newId, ...req.body }
+            data: { id, ...req.body }
         })
 
     } catch (error) {
@@ -40,4 +40,34 @@ const store = async (req, res) => {
 
 }
 
-export { index, store };
+const destroy = async (req, res) => {
+    try {
+
+        const id = req.validateId;
+
+        const eliminato = await Favorite.delete(id)
+
+        if (!eliminato) {
+            return res.status(404).json({
+                success: false,
+                message: 'Preferito non trovato'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Preferito eliminato con successo'
+        });
+
+    } catch (error) {
+
+        console.error("Errore nella cancellazione:", error);
+        res.status(500).json({
+            success: false,
+            message: 'Errore interno del server'
+        });
+
+    }
+}
+
+export { index, store, destroy };
