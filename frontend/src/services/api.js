@@ -15,7 +15,7 @@ const apiFetch = async (endpoint, options = {}) => {
             throw new Error(result.message || "Errore generico dal Server");
         }
 
-        return result.data;
+        return result;
     } catch (error) {
         console.error("API Fetch Error:", error.message);
         throw error;
