@@ -74,13 +74,13 @@ DB_USERNAME=tuo_utente_db
 DB_PASSWORD=tua_password_db
 DB_DATABASE=dashboard_db
 
-DEMO_KEY_REST_COUNTRIES=chiave_per_la_demo_di_restcountries
+KEY_REST_COUNTRIES=api_key_di_restcountries
 ```
 
 **frontend/.env**
 
 ```
-VITE_API_URL_BACKEND=http://localhost:3000
+VITE_API_URL_BACKEND= url dove girerà il backend
 ```
 
 ### Setup del database
@@ -138,4 +138,4 @@ Essendo un progetto personale a scopo di apprendimento, non sono attualmente pre
 
 ## Licenza
 
-Distribuito con licenza [ISC](https://opensource.org/licenses/ISC).
+Progetto a scopo didattico. 
