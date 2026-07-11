@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-app.use('/favorite', favoriteRoute);
+app.use('/favoriti', favoriteRoute);
 
 app.listen(PORT, () => {
     console.log("server in ascolto sulla porta", PORT);
