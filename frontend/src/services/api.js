@@ -24,3 +24,25 @@ const apiFetch = async (endpoint, options = {}) => {
     }
 
 }
+
+const externalDataFetch = async (url) => {
+    try {
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`Errore http ${response.status}`)
+        }
+
+        const result = await response.json();
+
+        return result;
+
+    } catch (error) {
+
+        console.error("Errore nella chiamata esterna:", error);
+
+        throw error;
+    }
+}
+
+export { apiFetch, externalDataFetch }
