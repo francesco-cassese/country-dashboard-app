@@ -1,11 +1,13 @@
-# Root
 node_modules/
-.env
 .DS_Store
+.env
 
-# Frontend
-frontend/build/
-frontend/dist/
-
-# Backend
-backend/node_modules/
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
