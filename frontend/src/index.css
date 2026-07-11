@@ -9,3 +9,10 @@
   padding: 0;
   box-sizing: border-box;
 }
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background-color: #f5f6fa;
+  color: #1f2933;
+  line-height: 1.5;
+}

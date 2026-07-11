@@ -1,9 +1,9 @@
 import CountryCard from './CountryCard.jsx';
 import styles from './CountryList.module.css';
 
-const CountryList = ({ displayData, onToggleFavorite }) => {
+const CountryList = ({ displayData, onToggleFavorite, emptyMessage = 'Nessun dato disponibile.' }) => {
     if (!displayData || displayData.length === 0) {
-        return <p>Nessun dato disponibile.</p>;
+        return <p className={styles.emptyMessage}>{emptyMessage}</p>;
     }
 
     return (

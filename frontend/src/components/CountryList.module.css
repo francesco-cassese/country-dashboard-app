@@ -1,6 +1,12 @@
 .listContainer {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 16px;
-    padding: 20px;
+    padding: 8px 0 24px;
+}
+
+.emptyMessage {
+    padding: 24px 0;
+    color: #6b7280;
+    font-style: italic;
 }
