@@ -6,6 +6,7 @@ import styles from "./Dashboard.module.css";
 function Dashboard() {
     const {
         countries,
+        favorites,
         loading,
         isPaginating,
         error,
@@ -22,8 +23,6 @@ function Dashboard() {
 
     if (loading) return <div className={styles.statusMessage}>Caricamento in corso...</div>;
     if (error) return <div className={styles.statusMessage}>Errore: {error}</div>;
-
-    const favoriteCountries = countries.filter((country) => country.isFavorite);
 
     return (
         <div className={styles.dashboard}>
@@ -57,7 +56,7 @@ function Dashboard() {
             <section className={styles.favoritesSection}>
                 <h2 className={styles.sectionTitle}>Preferiti</h2>
                 <CountryList
-                    displayData={favoriteCountries}
+                    displayData={favorites}
                     onToggleFavorite={toggleFavorite}
                     emptyMessage="Nessun paese preferito ancora."
                 />

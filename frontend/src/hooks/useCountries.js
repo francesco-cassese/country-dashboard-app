@@ -2,8 +2,33 @@ import { useState, useCallback } from 'react';
 import { apiFetch } from '../services/api';
 import { mergeData } from '../services/dataTransformer';
 
+const favoriteCacheKey = (rawCode) => String(Number(rawCode));
+
+const buildFavoritesCache = (prevCache, mergedCountries, favoritesFromApi) => {
+    const next = {};
+
+    favoritesFromApi.forEach((fav) => {
+        const key = favoriteCacheKey(fav.api_id);
+        next[key] = prevCache[key] || {
+            codes: { ccn3: fav.api_id },
+            names: { common: fav.paese || fav.titolo },
+            isFavorite: true,
+            id: fav.id
+        };
+    });
+
+    mergedCountries.forEach((country) => {
+        if (country.isFavorite) {
+            next[favoriteCacheKey(country.codes.ccn3)] = country;
+        }
+    });
+
+    return next;
+};
+
 const useCountries = () => {
     const [countries, setCountries] = useState([]);
+    const [favoritesCache, setFavoritesCache] = useState({});
     const [loading, setLoading] = useState(true);
     const [isPaginating, setIsPaginating] = useState(false);
     const [error, setError] = useState(null);
@@ -27,7 +52,10 @@ const useCountries = () => {
                 throw new Error("Errore nel formato dati ricevuto dal server");
             }
 
-            setCountries(mergeData(countriesData, myFavorites));
+            const merged = mergeData(countriesData, myFavorites);
+
+            setCountries(merged);
+            setFavoritesCache((prev) => buildFavoritesCache(prev, merged, myFavorites));
             setPage(countriesResponse.meta.page);
             setTotalPages(countriesResponse.meta.totalPages);
         } catch (err) {
@@ -58,6 +86,11 @@ const useCountries = () => {
                 await apiFetch(`/favorities/${country.id}`, { method: 'DELETE' });
 
                 updateCountryFavoriteState(countryCode, { isFavorite: false, id: null });
+                setFavoritesCache((prev) => {
+                    const next = { ...prev };
+                    delete next[favoriteCacheKey(countryCode)];
+                    return next;
+                });
             } else {
                 const favoritePayload = {
                     api_id: countryCode,
@@ -73,6 +106,10 @@ const useCountries = () => {
                 });
 
                 updateCountryFavoriteState(countryCode, { isFavorite: true, id: created.data.id });
+                setFavoritesCache((prev) => ({
+                    ...prev,
+                    [favoriteCacheKey(countryCode)]: { ...country, isFavorite: true, id: created.data.id }
+                }));
             }
         } catch (err) {
             console.error("Errore durante il toggle:", err);
@@ -80,7 +117,9 @@ const useCountries = () => {
         }
     };
 
-    return { countries, loading, isPaginating, error, page, totalPages, loadAllData, goToPage, toggleFavorite };
+    const favorites = Object.values(favoritesCache);
+
+    return { countries, favorites, loading, isPaginating, error, page, totalPages, loadAllData, goToPage, toggleFavorite };
 };
 
 export default useCountries;
