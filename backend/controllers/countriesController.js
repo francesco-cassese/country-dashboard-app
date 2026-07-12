@@ -1,4 +1,4 @@
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 24;
 
 const getAllCountries = async (req, res) => {
     try {
