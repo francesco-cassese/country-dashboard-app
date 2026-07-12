@@ -1,0 +1,22 @@
+.containerImg {
+    width: 100px;
+    aspect-ratio: 1;
+    margin-right: 20px;
+}
+
+.containerImg img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+}
+
+.titlePage {
+    font-size: 30px;
+    font-weight: 800;
+}
+
+.containerHeader {
+    display: flex;
+    align-items: center;
+}

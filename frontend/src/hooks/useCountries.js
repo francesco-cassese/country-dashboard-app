@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { apiFetch } from '../services/api';
 import { mergeData } from '../services/dataTransformer';
+import { addFavorite, removeFavorite } from '../services/favorites';
 
 const favoriteCacheKey = (rawCode) => String(Number(rawCode));
 
@@ -83,7 +84,7 @@ const useCountries = () => {
             const countryCode = country.codes.ccn3;
 
             if (country.isFavorite) {
-                await apiFetch(`/favorities/${country.id}`, { method: 'DELETE' });
+                await removeFavorite(country.id);
 
                 updateCountryFavoriteState(countryCode, { isFavorite: false, id: null });
                 setFavoritesCache((prev) => {
@@ -92,18 +93,7 @@ const useCountries = () => {
                     return next;
                 });
             } else {
-                const favoritePayload = {
-                    api_id: countryCode,
-                    titolo: country.names.common,
-                    paese: country.names.common,
-                    contenuto: 'Paese preferito'
-                };
-
-                const created = await apiFetch('/favorities', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(favoritePayload)
-                });
+                const created = await addFavorite(country);
 
                 updateCountryFavoriteState(countryCode, { isFavorite: true, id: created.data.id });
                 setFavoritesCache((prev) => ({
