@@ -10,6 +10,11 @@ function Navbar() {
                             Dashboard
                         </NavLink>
                     </li>
+                    <li>
+                        <NavLink to='/favorites'>
+                            Preferiti
+                        </NavLink>
+                    </li>
                 </ul>
             </nav>
         </>

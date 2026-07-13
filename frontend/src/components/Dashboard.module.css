@@ -52,15 +52,3 @@
     min-width: 140px;
     text-align: center;
 }
-
-.favoritesSection {
-    margin-top: 40px;
-    border-top: 1px solid #e5e7eb;
-    padding-top: 24px;
-}
-
-.sectionTitle {
-    font-size: 1.35rem;
-    margin-bottom: 4px;
-    color: #1f2933;
-}

@@ -1,35 +1,10 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { apiFetch } from '../services/api';
-import { mergeData } from '../services/dataTransformer';
-import { addFavorite, removeFavorite } from '../services/favorites';
-
-const favoriteCacheKey = (rawCode) => String(Number(rawCode));
-
-const buildFavoritesCache = (prevCache, mergedCountries, favoritesFromApi) => {
-    const next = {};
-
-    favoritesFromApi.forEach((fav) => {
-        const key = favoriteCacheKey(fav.api_id);
-        next[key] = prevCache[key] || {
-            codes: { ccn3: fav.api_id },
-            names: { common: fav.paese || fav.titolo },
-            isFavorite: true,
-            id: fav.id
-        };
-    });
-
-    mergedCountries.forEach((country) => {
-        if (country.isFavorite) {
-            next[favoriteCacheKey(country.codes.ccn3)] = country;
-        }
-    });
-
-    return next;
-};
+import useFavorites from './useFavorites';
 
 const useCountries = () => {
-    const [countries, setCountries] = useState([]);
-    const [favoritesCache, setFavoritesCache] = useState({});
+    const { favorites, toggleFavorite: toggleFavoriteContext, mergeFavoriteStatus } = useFavorites();
+    const [rawCountries, setRawCountries] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isPaginating, setIsPaginating] = useState(false);
     const [error, setError] = useState(null);
@@ -41,22 +16,14 @@ const useCountries = () => {
             setIsPaginating(true);
             setError(null);
 
-            const [countriesResponse, favoritesResponse] = await Promise.all([
-                apiFetch(`/countries?page=${pageToLoad}`),
-                apiFetch('/favorities')
-            ]);
-
+            const countriesResponse = await apiFetch(`/countries?page=${pageToLoad}`);
             const countriesData = countriesResponse.data;
-            const myFavorites = favoritesResponse.data;
 
-            if (!Array.isArray(countriesData) || !Array.isArray(myFavorites)) {
+            if (!Array.isArray(countriesData)) {
                 throw new Error("Errore nel formato dati ricevuto dal server");
             }
 
-            const merged = mergeData(countriesData, myFavorites);
-
-            setCountries(merged);
-            setFavoritesCache((prev) => buildFavoritesCache(prev, merged, myFavorites));
+            setRawCountries(countriesData);
             setPage(countriesResponse.meta.page);
             setTotalPages(countriesResponse.meta.totalPages);
         } catch (err) {
@@ -73,41 +40,11 @@ const useCountries = () => {
         loadAllData(nextPage);
     };
 
-    const updateCountryFavoriteState = (countryCode, patch) => {
-        setCountries((prev) => prev.map((country) =>
-            country.codes.ccn3 === countryCode ? { ...country, ...patch } : country
-        ));
-    };
+    const countries = useMemo(() => mergeFavoriteStatus(rawCountries), [rawCountries, favorites]);
 
     const toggleFavorite = async (country) => {
-        try {
-            const countryCode = country.codes.ccn3;
-
-            if (country.isFavorite) {
-                await removeFavorite(country.id);
-
-                updateCountryFavoriteState(countryCode, { isFavorite: false, id: null });
-                setFavoritesCache((prev) => {
-                    const next = { ...prev };
-                    delete next[favoriteCacheKey(countryCode)];
-                    return next;
-                });
-            } else {
-                const created = await addFavorite(country);
-
-                updateCountryFavoriteState(countryCode, { isFavorite: true, id: created.data.id });
-                setFavoritesCache((prev) => ({
-                    ...prev,
-                    [favoriteCacheKey(countryCode)]: { ...country, isFavorite: true, id: created.data.id }
-                }));
-            }
-        } catch (err) {
-            console.error("Errore durante il toggle:", err);
-            throw err;
-        }
+        await toggleFavoriteContext(country);
     };
-
-    const favorites = Object.values(favoritesCache);
 
     return { countries, favorites, loading, isPaginating, error, page, totalPages, loadAllData, goToPage, toggleFavorite };
 };
