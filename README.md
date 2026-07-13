@@ -23,6 +23,7 @@ Questo repository nasce come esercizio pratico per sperimentare un'architettura 
 
 **Frontend**
 - [React 19](https://react.dev/)
+- [React Router](https://reactrouter.com/) per il routing (Dashboard, dettaglio paese, preferiti)
 - [Vite](https://vitejs.dev/) come build tool e dev server
 - CSS Modules per lo styling
 - ESLint per il linting
@@ -115,20 +116,36 @@ pnpm build
 
 L'app frontend sarà disponibile all'indirizzo indicato da Vite (di default `http://localhost:5173`), mentre il backend risponderà sulla porta configurata in `PORT` (default `3000`).
 
+### Pagine e navigazione
+
+Il frontend usa React Router con tre rotte principali, condivise da un layout comune con header e navbar:
+
+- `/` – Dashboard con l'elenco paginato dei paesi
+- `/countries/:ccn3` – Dettaglio di un singolo paese
+- `/favorites` – Elenco dei paesi salvati come preferiti
+
+Lo stato dei preferiti è centralizzato in un `FavoritesContext` (esposto tramite l'hook `useFavorites`), condiviso tra Dashboard, dettaglio paese e pagina Preferiti così da restare sincronizzato senza richieste ripetute al backend.
+
+### Caching lato backend
+
+Le risposte dell'API esterna REST Countries (elenco paginato e dettaglio singolo paese) vengono mantenute in cache in memoria sul backend per 15 minuti, per ridurre le chiamate esterne e velocizzare le risposte.
+
 ## Struttura del progetto
 
 ```
 country-dashboard-app/
 ├── backend/
-│   ├── controllers/     # Logica delle route (countries, favorites)
+│   ├── controllers/     # Logica delle route (countries con cache in-memory, favorites)
 │   ├── database/        # Connessione MySQL e schema SQL
 │   ├── middlewares/      # Validazione richieste
 │   ├── routers/          # Definizione degli endpoint Express
 │   └── server.js         # Entry point del server
 └── frontend/
     └── src/
-        ├── components/   # Componenti React (Dashboard, CountryList, CountryCard)
-        ├── hooks/         # Custom hook (useCountries)
+        ├── components/   # Componenti React (Dashboard, CountryList, CountryCard, CountryDetail, FavoritesPage, Navbar)
+        ├── context/       # FavoritesContext (stato preferiti condiviso)
+        ├── layouts/       # PageLayout (header, navbar, footer condivisi tra le pagine)
+        ├── hooks/         # Custom hook (useCountries, useCountryDetail, useFavorites)
         └── services/      # Chiamate API e trasformazione dati
 ```
 
